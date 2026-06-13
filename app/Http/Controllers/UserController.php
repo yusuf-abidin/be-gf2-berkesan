@@ -18,8 +18,6 @@ class UserController extends Controller
     public function getAllUsers()
     {
         $users = User::orderBy('name')->get();
-        return $this->successResponse([
-            'users' => UserResource::collection($users)
-        ], "Berhasil mendapatkan semua data user");
+        return $this->successResponse(UserResource::collection($users), "Berhasil mendapatkan semua data user");
     }
 }
