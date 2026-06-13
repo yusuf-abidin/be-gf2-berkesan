@@ -6,6 +6,7 @@ use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Models\RegistrationCode;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -48,5 +49,11 @@ class AuthController extends Controller
             'access_token' => $token,
             'token_type' => 'Bearer'
         ], "Login berhasil");
+    }
+
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+        return $this->successResponse(null, "Logout berhasil");
     }
 }
