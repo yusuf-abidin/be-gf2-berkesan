@@ -49,5 +49,4 @@ class AuthController extends Controller
             'token_type' => 'Bearer'
         ], "Login berhasil");
     }
-
 }
