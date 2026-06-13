@@ -19,6 +19,9 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::middleware('role:ADMIN')->group(function () {
+
+        Route::get('/users', [\App\Http\Controllers\UserController::class, 'getAllUsers']);
+
         Route::prefix('registration-codes')->group(function () {
             Route::get('', [\App\Http\Controllers\RegistrationCodeController::class, 'getRegistrationCode']);
             Route::post('', [\App\Http\Controllers\RegistrationCodeController::class, 'store']);
