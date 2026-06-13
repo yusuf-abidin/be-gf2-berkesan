@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -56,6 +57,15 @@ return Application::configure(basePath: dirname(__DIR__))
                     'success' => false,
                     'message' => 'Anda tidak diizinkan untuk mengakses resource ini.',
                 ], 403);
+            }
+        });
+
+        $exceptions->render(function (RouteNotFoundException $e, Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Anda tidak memiliki akses. Silakan login terlebih dahulu',
+                ], 401);
             }
         });
 
