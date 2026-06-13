@@ -4,13 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
-use App\Http\Resources\UserResource;
 use App\Models\RegistrationCode;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -53,11 +50,4 @@ class AuthController extends Controller
         ], "Login berhasil");
     }
 
-    public function me(Request $request)
-    {
-        $user = $request->user();
-        Log::info($user);
-        $data = UserResource::make($user);
-        return $this->successResponse($data, "Berhasil mendapatkan data user");
-    }
 }
