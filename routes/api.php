@@ -7,9 +7,12 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::prefix('/auth')->group(function () {
-    Route::post('/register', [\App\Http\Controllers\AuthController::class, 'register']);
-    Route::post('/login', [\App\Http\Controllers\AuthController::class, 'login']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::prefix('/auth')->group(function () {
+        Route::post('/register', [\App\Http\Controllers\AuthController::class, 'register']);
+        Route::post('/login', [\App\Http\Controllers\AuthController::class, 'login']);
+        Route::get('/me', [\App\Http\Controllers\AuthController::class, 'me']);
+    });
 });
 
 Route::prefix('registration-codes')->group(function () {
