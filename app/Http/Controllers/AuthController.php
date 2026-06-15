@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
+use App\Http\Resources\UserResource;
 use App\Models\RegistrationCode;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -47,7 +48,8 @@ class AuthController extends Controller
         $token = $user->createToken('auth_token')->plainTextToken;
         return $this->successResponse([
             'access_token' => $token,
-            'token_type' => 'Bearer'
+            'token_type' => 'Bearer',
+            'user' => new UserResource($user),
         ], "Login berhasil");
     }
 
