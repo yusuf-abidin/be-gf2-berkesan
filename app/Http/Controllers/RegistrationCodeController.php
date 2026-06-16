@@ -11,7 +11,7 @@ class RegistrationCodeController extends Controller
 {
     public function getRegistrationCode(): JsonResponse
     {
-        $codes = RegistrationCode::all();
+        $codes = RegistrationCode::orderBy('created_at', 'desc')->get();
         $data =RegistrationCodeResource::collection($codes);
 
         return $this->successResponse($data, "Berhasil mendapatkan data kode registrasi");
