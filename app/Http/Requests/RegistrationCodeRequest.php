@@ -32,9 +32,22 @@ class RegistrationCodeRequest extends FormRequest
         ];
 
         return [
-            'code' => ['required', 'string', 'max:255', 'unique:registration_codes,code'],
+            'code' => ['required', 'string', 'max:255', 'unique:registration_codes,code', 'regex:/^[a-zA-Z0-9_-]+$/',],
             'expires_at' => ['required', 'integer', Rule::in($allowedMinutes)],
             'usage_limit' => ['nullable', 'integer', 'min:1'],
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'code.required' => 'Kode registrasi wajib diisi.',
+            'code.unique' => 'Kode registrasi sudah digunakan.',
+            'code.regex' => 'Kode registrasi hanya boleh mengandung huruf, angka, dan tanda "-" atau "_".',
+            'expires_at.required' => 'Waktu kedaluwarsa wajib diisi.',
+            'expires_at.in' => 'Waktu kedaluwarsa harus berupa angka dan memiliki nilai yang valid.',
+            'usage_limit.min' => 'Jumlah penggunaan minimal harus 1.',
+            'usage_limit.integer' => 'Jumlah penggunaan harus berupa angka.',
         ];
     }
 }

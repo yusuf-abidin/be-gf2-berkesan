@@ -19,6 +19,7 @@ class RegistrationCodeController extends Controller
     public function store(RegistrationCodeRequest $request)
     {
         $validated = $request->validated();
+        $validated['code'] = strtoupper($validated['code']);
         $validated['expires_at'] = now()->addMinutes($validated['expires_at']);
         RegistrationCode::create($validated);
 
