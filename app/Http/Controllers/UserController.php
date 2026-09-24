@@ -20,4 +20,22 @@ class UserController extends Controller
         $users = User::orderBy('name')->get();
         return $this->successResponse(UserResource::collection($users), "Berhasil mendapatkan semua data user");
     }
+
+    public function updateRole(Request $request, User $user)
+    {
+        $validated = $request->validate([
+            'role' => 'required|in:ADMIN,USER',
+        ]);
+
+        // Prevent demoting self to avoid accidental lockout
+        if ($user->id === $request->user()->id && $validated['role'] !== 'ADMIN') {
+            return $this->errorResponse("Anda tidak dapat mencabut akses Admin Anda sendiri demi menghindari terkunci dari sistem.", 400);
+        }
+
+        $user->update([
+            'role' => $validated['role']
+        ]);
+
+        return $this->successResponse(UserResource::make($user), "Berhasil mengubah peran pengguna");
+    }
 }
