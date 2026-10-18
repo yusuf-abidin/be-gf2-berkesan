@@ -31,7 +31,7 @@ class PasswordResetController extends Controller
             'is_used' => false,
         ]);
 
-        $frontendUrl = env('FRONTEND_URL', 'http://localhost:3000');
+        $frontendUrl = config('app.frontend_url', 'http://localhost:3000');
         $resetUrl = "{$frontendUrl}/reset-password?token={$token}";
 
         return $this->successResponse([
