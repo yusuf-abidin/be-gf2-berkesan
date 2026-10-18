@@ -25,6 +25,7 @@ class ContributionController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'is_public' => 'sometimes|boolean',
         ]);
 
         $type = ContributionType::create($validated);
@@ -36,6 +37,7 @@ class ContributionController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'is_public' => 'sometimes|boolean',
         ]);
 
         $type->update($validated);
@@ -222,6 +224,76 @@ class ContributionController extends Controller
                 'amount' => $totalPaid
             ]);
         }
+    }
+
+    // -------------------------------------------------------------
+    // Public Transparency for Residents (USER role)
+    // -------------------------------------------------------------
+    public function getPublicTypes()
+    {
+        $types = ContributionType::where('is_public', true)
+            ->orderBy('name')
+            ->get();
+        return $this->successResponse($types, "Berhasil mendapatkan jenis iuran publik");
+    }
+
+    public function getPublicPeriods(ContributionType $type)
+    {
+        if (!$type->is_public) {
+            return $this->errorResponse("Jenis iuran ini tidak dibuka untuk publik", 403);
+        }
+
+        $periods = ContributionPeriod::where('contribution_type_id', $type->id)
+            ->orderBy('year', 'desc')
+            ->orderBy('month', 'desc')
+            ->get(['id', 'contribution_type_id', 'month', 'year']);
+
+        return $this->successResponse($periods, "Berhasil mendapatkan periode iuran");
+    }
+
+    public function getUnpaidResidents(ContributionPeriod $period)
+    {
+        if (!$period->contributionType->is_public) {
+            return $this->errorResponse("Jenis iuran ini tidak dibuka untuk publik", 403);
+        }
+
+        // Self-healing: Ensure every resident has a payment record for this period
+        $residents = Resident::all();
+        $existingResidentIds = ContributionPayment::where('contribution_period_id', $period->id)
+            ->pluck('resident_id')
+            ->toArray();
+
+        $missingResidentIds = $residents->pluck('id')->diff($existingResidentIds);
+        if ($missingResidentIds->isNotEmpty()) {
+            foreach ($missingResidentIds as $residentId) {
+                ContributionPayment::create([
+                    'contribution_period_id' => $period->id,
+                    'resident_id' => $residentId,
+                    'amount_paid' => 0,
+                    'payment_status' => 'UNPAID',
+                ]);
+            }
+        }
+
+        $unpaidPayments = ContributionPayment::where('contribution_period_id', $period->id)
+            ->where('payment_status', 'UNPAID')
+            ->join('residents', 'residents.id', '=', 'contribution_payments.resident_id')
+            ->orderBy('residents.name', 'asc')
+            ->select('contribution_payments.*')
+            ->with('resident')
+            ->get();
+
+        $data = $unpaidPayments->map(function ($pay) {
+            return [
+                'id' => $pay->id,
+                'resident_id' => $pay->resident_id,
+                'name' => $pay->resident->name,
+                'block' => $pay->resident->block,
+                'house_number' => $pay->resident->house_number,
+            ];
+        })->values();
+
+        return $this->successResponse($data, "Berhasil mendapatkan daftar warga yang belum membayar");
     }
 
     private function getMonthName($monthNum)

@@ -10,7 +10,15 @@ class ContributionType extends Model
     protected $fillable = [
         'name',
         'description',
+        'is_public',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'is_public' => 'boolean',
+        ];
+    }
 
     public function periods(): HasMany
     {

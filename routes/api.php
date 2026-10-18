@@ -28,6 +28,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/accounts/{account}/periods', [\App\Http\Controllers\PeriodController::class, 'getPeriodsByAccount'])->whereNumber('account');
     Route::get('/periods/{period}/transactions', [\App\Http\Controllers\TransactionController::class, 'getTransactionsByPeriod'])->whereNumber('period');
 
+    Route::get('/public-contributions/types', [\App\Http\Controllers\ContributionController::class, 'getPublicTypes']);
+    Route::get('/public-contributions/types/{type}/periods', [\App\Http\Controllers\ContributionController::class, 'getPublicPeriods'])->whereNumber('type');
+    Route::get('/public-contributions/periods/{period}/unpaid', [\App\Http\Controllers\ContributionController::class, 'getUnpaidResidents'])->whereNumber('period');
+
     Route::middleware('role:ADMIN')->group(function () {
 
         Route::patch('/settings', [\App\Http\Controllers\SettingController::class, 'update']);

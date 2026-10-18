@@ -105,6 +105,7 @@ class DatabaseSeeder extends Seeder
         $iuranRutin = ContributionType::create([
             'name' => 'Iuran Rutin RT',
             'description' => 'Iuran wajib bulanan warga RT 01 untuk kas sosial dan kebersihan.',
+            'is_public' => true,
         ]);
 
         // 8. Seed Contribution Period (June 2026)
